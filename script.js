@@ -3,7 +3,7 @@ const add = function(a, b) {
 }
 
 const subtract = function(a, b) {
-    return a -b;
+    return a - b;
 }
 
 const multiply = function(a, b) {
@@ -16,6 +16,7 @@ const divide = function(a, b) {
 
 let firstNumber = 0;
 let secondNumber = 0;
+let result = 0;
 let operator = "";
 
 const operate = function(operator, firstNumber, secondNumber) {
@@ -59,9 +60,17 @@ clickButton.forEach((box) => {
 //Initialize click counter; this keeps track of the number of clicks we make
 let click = 0;
 
+//Initialize variable for the current value of calculator
 let currentValue = '';
 
+//Initialize empty array to keep track of values of buttons clicked
 let history = [];
+
+let screenChange = document.querySelector('p');
+
+let counter = 0;
+
+let operatorChain = false;
 
 function number(array) {
     //The array numbers are combined to create a number depending on
@@ -73,22 +82,176 @@ function calculator(e) {;
     
     currentValue = e.target.innerHTML;
     history.push(currentValue);
+    screenChange.innerHTML = history.join("");
     if(currentValue === 'Clear') {
         history.splice(0, history.length);
+        screenChange.innerHTML = "0";
+        operatorChain = false;
     }
-    
+/*
+Note to self:
+
+I feel like this can all be done without all these statements by doing the following:
+-A simple array with the different operators
+-Do an ifIn or a contains method or whatever to see if it's in there
+-There isn't a need for a result variable:
+  -The first number simply becomes the result and then we proceed as usual
+  -THere is nothing really special about the equals sign, it's just another operator
+*/    
     switch(currentValue) {
-        case "Clear":
-            history.splice(0, history.length);
-            break;
         case "/":
+            if(operatorChain) {
+                //operator = divide;
+                history.pop();
+                secondNumber = history.join("");
+                result = operate(operator, firstNumber, secondNumber);
+                operator = divide;
+                screenChange.innerHTML = result;
+                firstNumber = result;
+                history.splice(0, history.length);
+                break;
+
+            }
+
+            operator = divide;
             history.pop();
-            console.log(history.join(""));
-            console.log(history);
-            
+            firstNumber = history.join("");
+            screenChange.innerHTML = firstNumber;
+            history.splice(0, history.length);
+            operatorChain = true;
+            break;
+
+        case("*"):
+            if(operatorChain) {
+                //operator = multiply;
+                history.pop();
+                secondNumber = history.join("");
+                result = operate(operator, firstNumber, secondNumber);
+                operator = multiply;
+                screenChange.innerHTML = result;
+                firstNumber = result;
+                history.splice(0, history.length);
+                break;
+            }
+
+            operator = multiply;
+            history.pop();
+            firstNumber = history.join("");
+            screenChange.innerHTML = firstNumber;
+            history.splice(0, history.length);
+            operatorChain = true;
+            break;
+
+        case("-"):
+            if(operatorChain) {
+                history.pop();
+                secondNumber = history.join("");
+                result = operate(operator, firstNumber, secondNumber);
+                operator = subtract;
+                screenChange.innerHTML = result;
+                firstNumber = result;
+                history.splice(0, history.length);
+                break;
+            }
+
+            operator = subtract;
+            history.pop();
+            firstNumber = history.join("");
+            screenChange.innerHTML = firstNumber;
+            history.splice(0, history.length);
+            operatorChain = true;
+            break;
+
+        case("+"):
+            if(operatorChain) {
+                history.pop();
+                secondNumber = parseInt(history.join(""));
+                result = operate(operator, firstNumber, secondNumber);
+                operator = add;
+                screenChange.innerHTML = result;
+                firstNumber = result;
+                history.splice(0, history.length);
+                break;
+            }
+
+            operator = add;
+            history.pop();
+            firstNumber = parseInt(history.join(""));
+            screenChange.innerHTML = firstNumber;
+            history.splice(0, history.length);
+            operatorChain = true;
+            break;
+
+        case("="):
+            history.pop();
+            secondNumber = parseInt(history.join(""));
+            result = operate(operator, firstNumber, secondNumber);
+            screenChange.innerHTML = result;
+            history.splice(0, history.length);
+            operatorChain = false;
+            break;
+
     }
 
-    console.log(history);
+
+    /*switch(currentValue) {
+        case "Clear":
+            history.splice(0, history.length);
+            screenChange.innerHTML = "0";
+            break;
+
+        case "/":
+            if(operatorChain) {
+                operator = divide;
+                history.pop();
+                secondNumber = history.join("");
+                result = operate(operator, firstNumber, secondNumber);
+                screenChange.innerHTML = result;
+                firstNumber = result;
+                history.splice(0, history.length);
+                break;
+            }
+                operator = divide;
+                history.pop();
+                firstNumber = history.join("");
+                screenChange.innerHTML = history.join("");
+                history.splice(0, history.length);
+                operatorChain = true;
+                break;
+        case "*":
+            if(operatorChain) {
+                operator = multiply;
+                history.pop();
+                secondNumber = history.join("");
+                console.log(secondNumber);
+                console.log(firstNumber)
+                result = operator(operator, Number(firstNumber), Number(secondNumber));
+                console.log(result);
+                screenChange.innerHTML = result;
+                firstNumber = result;
+                history.splice(0, history.length);
+                break;
+            }
+                operator = multiply;
+                history.pop();
+                firstNumber = history.join("");
+                screenChange.innerHTML = history.join("");
+                history.splice(0, history.length);
+                operatorChain = true;
+                break;
+
+        case "=":
+            history.pop();
+            secondNumber = history.join("");
+            history.splice(0, history.length);
+            screenChange.innerHTML = operate(operator, firstNumber, secondNumber);
+            operatorChain = false;
+
+
+            
+    }*/
+
+    //console.log(history);
     /*if(click === 0) {
         firstNumber = e.target.innerHTML;
         currentValue = '1';
